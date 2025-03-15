@@ -28,28 +28,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ className }) => {
 
   const nammaCoinsOptions = [
     {
-      name: "BookMyShow",
-      description: "Get up to ₹200 off on movie tickets",
-      points: 400,
-      image: "/bookmyshow-logo.png"
-    },
-    {
-      name: "Myntra",
-      description: "₹500 Myntra gift voucher",
-      points: 800,
-      image: "/myntra-logo.png"
-    },
-    {
       name: "Amazon",
       description: "₹250 Amazon gift card",
       points: 500,
-      image: "/amazon-logo.png"
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/2560px-Amazon_logo.svg.png"
     },
     {
       name: "Swiggy",
       description: "₹150 off on your next order",
       points: 300,
-      image: "/swiggy-logo.png"
+      image: "https://logos-world.net/wp-content/uploads/2020/11/Swiggy-Logo.png"
     }
   ];
 
@@ -278,8 +266,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ className }) => {
                 <div className="grid gap-4">
                   {nammaCoinsOptions.map((option, index) => (
                     <div key={index} className="flex items-start p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="w-12 h-12 bg-muted rounded-lg mr-4 flex items-center justify-center">
-                        <img src={option.image} alt={option.name} className="w-8 h-8 object-contain" />
+                      <div className="w-16 h-16 bg-white rounded-lg mr-4 flex items-center justify-center p-2">
+                        <img src={option.image} alt={option.name} className="w-full h-full object-contain" />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold">{option.name}</h4>
