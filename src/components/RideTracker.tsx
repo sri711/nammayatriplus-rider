@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from "react";
-import { MapPin, Navigation, Phone, MessageSquare, Clock, CheckCircle2, ArrowUpRight } from "lucide-react";
+import { MapPin, Navigation, Phone, MessageSquare, Clock, CheckCircle2, ArrowUpRight, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface Driver {
   id: string;
@@ -143,6 +143,16 @@ const RideTracker: React.FC<RideTrackerProps> = ({
               >
                 <MessageSquare className="h-5 w-5" />
               </Button>
+              <Link to="/translate">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-10 w-10 rounded-full border-namma-blue/30 text-namma-blue"
+                  title="Translate conversation"
+                >
+                  <Languages className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
           

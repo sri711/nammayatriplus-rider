@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User, Clock, Home } from "lucide-react";
+import { Menu, X, User, Clock, Home, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +27,7 @@ const Header: React.FC = () => {
     { title: "Home", path: "/", icon: <Home className="w-5 h-5" /> },
     { title: "History", path: "/history", icon: <Clock className="w-5 h-5" /> },
     { title: "Profile", path: "/profile", icon: <User className="w-5 h-5" /> },
+    { title: "Translate", path: "/translate", icon: <Languages className="w-5 h-5" /> },
   ];
 
   return (
