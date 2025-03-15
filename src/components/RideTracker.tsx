@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Navigation, Phone, MessageSquare, Clock, CheckCircle2 } from "lucide-react";
+import { MapPin, Navigation, Phone, MessageSquare, Clock, CheckCircle2, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,9 @@ interface Driver {
   name: string;
   photo: string;
   rating: number;
-  vehicle_number: string;
+  vehicleNumber: string;
+  distance?: number;
+  eta?: number;
 }
 
 interface RideTrackerProps {
@@ -19,6 +21,7 @@ interface RideTrackerProps {
   destination: string;
   fare: number;
   estimatedTime: string;
+  distance?: number;
   onRideComplete: () => void;
   className?: string;
 }
@@ -31,12 +34,14 @@ const RideTracker: React.FC<RideTrackerProps> = ({
   destination,
   fare,
   estimatedTime,
+  distance,
   onRideComplete,
   className
 }) => {
   const [rideStatus, setRideStatus] = useState<RideStatus>("arriving");
   const [progress, setProgress] = useState(0);
   const [remainingTime, setRemainingTime] = useState(estimatedTime);
+  const [etaValue, setEtaValue] = useState<string>(estimatedTime);
 
   // Simulate ride progress
   useEffect(() => {
@@ -44,6 +49,7 @@ const RideTracker: React.FC<RideTrackerProps> = ({
       const timer = setTimeout(() => {
         setRideStatus("picked_up");
         setProgress(25);
+        setEtaValue(estimatedTime);
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -52,6 +58,12 @@ const RideTracker: React.FC<RideTrackerProps> = ({
       const timer = setTimeout(() => {
         setRideStatus("in_progress");
         setProgress(50);
+        
+        // Decrease ETA to show progress
+        if (etaValue.includes("min")) {
+          const mins = parseInt(etaValue.split(" ")[0]);
+          setEtaValue(`${Math.max(mins - 5, 1)} min`);
+        }
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -60,10 +72,11 @@ const RideTracker: React.FC<RideTrackerProps> = ({
       const timer = setTimeout(() => {
         setRideStatus("completed");
         setProgress(100);
+        setEtaValue("0 min");
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [rideStatus]);
+  }, [rideStatus, estimatedTime, etaValue]);
 
   useEffect(() => {
     if (rideStatus === "completed") {
@@ -109,7 +122,7 @@ const RideTracker: React.FC<RideTrackerProps> = ({
               </div>
               <div>
                 <h3 className="font-semibold">{driver.name}</h3>
-                <p className="text-sm text-muted-foreground">{driver.vehicle_number}</p>
+                <p className="text-sm text-muted-foreground">{driver.vehicleNumber}</p>
               </div>
             </div>
             
@@ -170,13 +183,19 @@ const RideTracker: React.FC<RideTrackerProps> = ({
           
           <Separator className="my-4" />
           
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 text-muted-foreground mr-2" />
-              <span className="text-sm text-muted-foreground">Estimated time:</span>
-              <span className="ml-1.5 font-medium">{remainingTime}</span>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-sm text-muted-foreground">Distance</div>
+              <div className="font-medium">{distance ? `${distance.toFixed(1)} km` : "--"}</div>
             </div>
-            <div className="font-semibold">₹{fare}</div>
+            <div>
+              <div className="text-sm text-muted-foreground">ETA</div>
+              <div className="font-medium">{etaValue}</div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground">Fare</div>
+              <div className="font-medium">₹{fare}</div>
+            </div>
           </div>
           
           {rideStatus === "completed" && (
@@ -184,6 +203,19 @@ const RideTracker: React.FC<RideTrackerProps> = ({
               <CheckCircle2 className="h-5 w-5 text-namma-green mr-2" />
               <span className="text-namma-green font-medium">Your ride is complete! Thank you for riding with Namma Yatri.</span>
             </div>
+          )}
+          
+          {rideStatus === "in_progress" && (
+            <Button
+              className="w-full mt-4 bg-namma-blue hover:bg-namma-blue/90 text-white"
+              onClick={() => {
+                setRideStatus("completed");
+                setProgress(100);
+              }}
+            >
+              <ArrowUpRight className="h-4 w-4 mr-2" />
+              Share Journey Status
+            </Button>
           )}
         </div>
       </div>

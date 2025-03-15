@@ -1,168 +1,191 @@
 
 import React, { useState, useEffect } from "react";
-import { Phone, MessageSquare, Star, RotateCw } from "lucide-react";
+import { Loader2, Star, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { formatTime } from "@/utils/rideUtils";
 
 interface Driver {
   id: string;
   name: string;
   photo: string;
   rating: number;
-  vehicle_number: string;
-  distance: string;
-  eta: string;
+  vehicleNumber: string;
+  distance: number;
+  eta: number;
 }
 
 interface DriverMatchProps {
+  drivers?: Driver[];
   onDriverConfirmed: (driver: Driver) => void;
   onCancel: () => void;
   className?: string;
 }
 
 const DriverMatch: React.FC<DriverMatchProps> = ({ 
+  drivers = [], 
   onDriverConfirmed, 
   onCancel,
   className 
 }) => {
-  const [isSearching, setIsSearching] = useState(true);
-  const [matchedDriver, setMatchedDriver] = useState<Driver | null>(null);
-  const [countdown, setCountdown] = useState(15);
+  const [loading, setLoading] = useState(true);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState(15); // 15 seconds countdown
 
   // Simulate driver matching process
   useEffect(() => {
-    const searchTimer = setTimeout(() => {
-      setIsSearching(false);
-      setMatchedDriver({
-        id: "d-123",
-        name: "Ramesh Kumar",
-        photo: "https://randomuser.me/api/portraits/men/32.jpg",
-        rating: 4.8,
-        vehicle_number: "KA 05 MJ 6789",
-        distance: "1.2 km",
-        eta: "4 min"
-      });
+    const timer = setTimeout(() => {
+      setLoading(false);
+      // Auto-select the nearest driver
+      if (drivers && drivers.length > 0) {
+        setSelectedDriver(drivers[0]);
+      }
     }, 3000);
-
-    return () => clearTimeout(searchTimer);
-  }, []);
+    
+    return () => clearTimeout(timer);
+  }, [drivers]);
 
   // Countdown timer for driver acceptance
   useEffect(() => {
-    if (!isSearching && matchedDriver) {
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
+    if (!loading && selectedDriver && timeRemaining > 0) {
+      const interval = setInterval(() => {
+        setTimeRemaining(prev => prev - 1);
       }, 1000);
-
-      return () => clearInterval(timer);
+      
+      return () => clearInterval(interval);
     }
-  }, [isSearching, matchedDriver]);
-
-  // Auto-confirm when countdown reaches 0
-  useEffect(() => {
-    if (countdown === 0 && matchedDriver) {
-      onDriverConfirmed(matchedDriver);
+    
+    if (!loading && selectedDriver && timeRemaining === 0) {
+      onDriverConfirmed(selectedDriver);
     }
-  }, [countdown, matchedDriver, onDriverConfirmed]);
+  }, [loading, selectedDriver, timeRemaining, onDriverConfirmed]);
+
+  const handleDriverAccept = () => {
+    if (selectedDriver) {
+      onDriverConfirmed(selectedDriver);
+    }
+  };
 
   return (
     <div className={cn("w-full animate-fade-in", className)}>
       <div className="bg-white rounded-xl shadow-md border overflow-hidden">
-        {isSearching ? (
-          <div className="p-8 flex flex-col items-center justify-center">
-            <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-6">
-              <RotateCw className="h-10 w-10 text-namma-blue animate-spin-slow" />
+        <div className="p-4 border-b">
+          <h2 className="font-semibold text-lg">
+            {loading ? "Finding your driver..." : "Driver found!"}
+          </h2>
+        </div>
+        
+        <div className="p-4">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <Loader2 className="h-12 w-12 text-namma-blue animate-spin mb-4" />
+              <p className="text-muted-foreground">Matching you with the nearest driver</p>
             </div>
-            <h2 className="text-xl font-semibold mb-2">Finding your driver</h2>
-            <p className="text-muted-foreground text-center max-w-xs">
-              We're connecting you with a nearby driver. This usually takes less than a minute.
-            </p>
-            <Button
-              variant="outline"
-              className="mt-8"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : matchedDriver ? (
-          <div className="p-5">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center">
-                <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-namma-blue">
-                  <img 
-                    src={matchedDriver.photo} 
-                    alt={matchedDriver.name}
-                    className="w-full h-full object-cover" 
-                  />
+          ) : selectedDriver ? (
+            <div className="space-y-4">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center">
+                  <div className="w-16 h-16 rounded-full overflow-hidden mr-3 border-2 border-namma-blue">
+                    <img 
+                      src={selectedDriver.photo} 
+                      alt={selectedDriver.name}
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{selectedDriver.name}</h3>
+                    <div className="flex items-center text-sm">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
+                      <span>{selectedDriver.rating.toFixed(1)}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{selectedDriver.vehicleNumber}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">{matchedDriver.name}</h3>
-                  <div className="flex items-center mt-1">
-                    <span className="text-sm bg-namma-green/10 text-namma-green px-2 py-0.5 rounded-full font-medium flex items-center">
-                      <Star className="h-3 w-3 mr-1 fill-namma-green text-namma-green" />
-                      {matchedDriver.rating}
-                    </span>
-                    <span className="text-sm text-muted-foreground ml-2">
-                      Auto • {matchedDriver.vehicle_number}
-                    </span>
+                
+                <div className="text-right">
+                  <div className="text-sm font-medium text-namma-blue">
+                    {selectedDriver.distance.toFixed(1)} km away
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    ETA: {formatTime(selectedDriver.eta)}
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end">
-                <div className="bg-namma-blue/10 text-namma-blue px-3 py-1 rounded-full font-medium">
-                  {matchedDriver.eta} away
+              
+              <div className="bg-muted/30 p-3 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Driver is accepting your request</span>
+                  <span className="font-medium text-namma-blue">{timeRemaining}s</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2 mt-2">
+                  <div
+                    className="bg-namma-blue h-2 rounded-full transition-all duration-1000"
+                    style={{ width: `${(1 - timeRemaining / 15) * 100}%` }}
+                  ></div>
                 </div>
               </div>
-            </div>
-            
-            <div className="mt-6 bg-muted/30 p-3 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Driver will arrive in</span>
-                <span className="text-lg font-semibold">{countdown} seconds</span>
+              
+              <div className="flex space-x-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
+                  onClick={onCancel}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-namma-blue hover:bg-namma-blue/90 text-white"
+                  onClick={handleDriverAccept}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Accept
+                </Button>
               </div>
-              <div className="w-full bg-muted rounded-full h-2 mt-2">
-                <div
-                  className="bg-namma-blue h-2 rounded-full transition-all"
-                  style={{ width: `${(countdown / 15) * 100}%` }}
-                ></div>
-              </div>
             </div>
-            
-            <div className="flex mt-6 space-x-3">
-              <Button
-                variant="outline"
-                className="flex-1 py-6 border-namma-blue/30 hover:bg-namma-blue/5 text-namma-blue"
-                onClick={() => alert("Calling driver...")}
-              >
-                <Phone className="h-5 w-5 mr-2" />
-                Call
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 py-6 border-namma-blue/30 hover:bg-namma-blue/5 text-namma-blue"
-                onClick={() => alert("Messaging driver...")}
-              >
-                <MessageSquare className="h-5 w-5 mr-2" />
-                Message
-              </Button>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8">
+              <p className="text-muted-foreground mb-4">No drivers available at the moment</p>
+              <Button onClick={onCancel}>Try Again</Button>
             </div>
-            
-            <Button
-              className="w-full mt-3 py-6 bg-namma-blue hover:bg-namma-blue/90 text-white font-medium"
-              onClick={() => onDriverConfirmed(matchedDriver)}
-            >
-              Confirm Driver
-            </Button>
-          </div>
-        ) : null}
+          )}
+        </div>
       </div>
+      
+      {!loading && drivers && drivers.length > 1 && (
+        <div className="mt-4">
+          <h3 className="text-sm font-medium mb-2">Other nearby drivers</h3>
+          <div className="space-y-2">
+            {drivers.slice(1).map((driver) => (
+              <div 
+                key={driver.id}
+                className="bg-white rounded-lg p-3 border flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                    <img 
+                      src={driver.photo} 
+                      alt={driver.name}
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">{driver.name}</div>
+                    <div className="flex items-center text-xs">
+                      <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 mr-1" />
+                      <span>{driver.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right text-xs">
+                  <div>{driver.distance.toFixed(1)} km</div>
+                  <div className="text-muted-foreground">{formatTime(driver.eta)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

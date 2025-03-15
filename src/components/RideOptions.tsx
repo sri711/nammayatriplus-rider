@@ -1,8 +1,9 @@
 
 import React, { useState } from "react";
-import { ChevronRight, Clock } from "lucide-react";
+import { Bike, Car, ChevronRight, Clock, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { vehicleTypes } from "@/data/dummyData";
 
 interface RideOption {
   id: string;
@@ -18,9 +19,15 @@ interface RideOptionsProps {
   options: RideOption[];
   onSelect: (option: RideOption) => void;
   className?: string;
+  distance?: number; // Distance in kilometers
 }
 
-const RideOptions: React.FC<RideOptionsProps> = ({ options, onSelect, className }) => {
+const RideOptions: React.FC<RideOptionsProps> = ({ 
+  options, 
+  onSelect, 
+  className,
+  distance = 5 // Default distance if not provided
+}) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const handleSelect = (option: RideOption) => {
@@ -28,11 +35,35 @@ const RideOptions: React.FC<RideOptionsProps> = ({ options, onSelect, className 
     onSelect(option);
   };
 
+  const getVehicleIcon = (vehicleId: string) => {
+    switch (vehicleId) {
+      case "bike":
+        return <Bike className="h-6 w-6" />;
+      case "auto":
+        return (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6">
+            <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" stroke="currentColor" strokeWidth="2"/>
+            <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" stroke="currentColor" strokeWidth="2"/>
+            <path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        );
+      case "cab":
+        return <Car className="h-6 w-6" />;
+      default:
+        return <MoreHorizontal className="h-6 w-6" />;
+    }
+  };
+
   return (
     <div className={cn("w-full animate-slide-up", className)}>
       <div className="bg-white rounded-xl shadow-md border overflow-hidden">
         <div className="p-4 border-b">
           <h2 className="font-semibold text-lg">Select Ride</h2>
+          {distance && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Distance: {distance} km
+            </p>
+          )}
         </div>
         
         <div className="divide-y">
@@ -50,11 +81,7 @@ const RideOptions: React.FC<RideOptionsProps> = ({ options, onSelect, className 
               >
                 <div className="flex items-center">
                   <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden flex items-center justify-center mr-3">
-                    <img 
-                      src={option.image} 
-                      alt={option.name} 
-                      className="w-12 h-12 object-contain"
-                    />
+                    {getVehicleIcon(option.id)}
                   </div>
                   
                   <div className="text-left">
