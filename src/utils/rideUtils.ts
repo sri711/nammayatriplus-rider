@@ -172,3 +172,49 @@ export const generateTrackingPath = (
   
   return result;
 };
+
+// This function implements a simple batched matching algorithm.
+// It expands the search radius until at least maxDrivers are found (or until a max radius is reached),
+// then sorts drivers based on ETA (primary) and rating (secondary).
+export function batchedMatchDrivers(
+  pickupLat: number,
+  pickupLng: number,
+  drivers: any[],
+  vehicleType: string,
+  maxDrivers: number = 3,
+  initialRadius: number = 2 // in kilometers
+) {
+  let radius = initialRadius;
+  let matchedDrivers: any[] = [];
+  const maxRadius = 10; // set an upper limit for search radius
+
+  // Expand search radius until we have enough drivers or we hit the max radius
+  while (radius <= maxRadius) {
+    matchedDrivers = drivers.filter((driver) => {
+      // Ensure driver is of the requested vehicle type
+      if (driver.vehicleType !== vehicleType) return false;
+      const dist = calculateDistance(pickupLat, pickupLng, driver.latitude, driver.longitude);
+      return dist <= radius;
+    });
+    if (matchedDrivers.length >= maxDrivers) {
+      break;
+    }
+    radius += 2; // increase radius by 2 km
+  }
+
+  // For each matched driver, calculate current distance and ETA
+  matchedDrivers = matchedDrivers.map((driver) => {
+    const dist = calculateDistance(pickupLat, pickupLng, driver.latitude, driver.longitude);
+    return {
+      ...driver,
+      distance: dist,
+      eta: calculateETA(dist, vehicleType)
+    };
+  });
+
+  // Sort drivers: primary sort by ETA ascending; if equal, sort by rating descending.
+  matchedDrivers.sort((a, b) => a.eta - b.eta || b.rating - a.rating);
+
+  // Return up to maxDrivers drivers
+  return matchedDrivers.slice(0, maxDrivers);
+}

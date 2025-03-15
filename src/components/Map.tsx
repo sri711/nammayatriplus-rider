@@ -1,154 +1,128 @@
-
-import React, { useEffect, useRef, useState } from "react";
-import { MapPin } from "lucide-react";
+import React, { useMemo } from "react";
+import { GoogleMap, useLoadScript, HeatmapLayer, Marker } from "@react-google-maps/api";
+import { driverDensityData, trafficData } from "@/data/newdummydata";
 
 interface MapProps {
-  pickup: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  };
-  destination?: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  };
-  driverLocation?: {
-    latitude: number;
-    longitude: number;
-  };
+  pickup: { latitude: number; longitude: number; address?: string };
+  destination: { latitude: number; longitude: number; address?: string };
+  driverLocation?: { latitude: number; longitude: number } | null;
   className?: string;
+  showHeatmap?: boolean;
+  drivers?: { id: string; latitude: number; longitude: number; vehicleType: string }[];
 }
 
-const Map: React.FC<MapProps> = ({ 
-  pickup, 
-  destination, 
-  driverLocation,
-  className 
-}) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
+const getIconForVehicle = (vehicleType: string) => {
+  if (vehicleType === "bike") return "/bike-icon.png";
+  if (vehicleType === "auto") return "/auto-icon.png";
+  if (vehicleType === "cab") return "/cab-icon.png";
+  if (vehicleType === "carpool") return "/carpool-icon.png";
+  return "";
+};
 
-  useEffect(() => {
-    // For now, we'll use a static map image as a placeholder
-    // In a real implementation, we would initialize Google Maps here
-    setTimeout(() => {
-      setMapLoaded(true);
-    }, 1000);
-  }, []);
+// Function to generate a small random offset (approx ±0.0005 degrees)
+const randomOffset = () => (Math.random() - 0.5) * 0.001;
+
+const Map: React.FC<MapProps> = ({ pickup, destination, driverLocation, className, showHeatmap, drivers }) => {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: "AIzaSyAtxaaw2GuXURkOtr6cq0Kzd_Tw-e8Xogw", // Replace with your actual API key.
+    libraries: ["visualization"],
+  });
+
+  const center = useMemo(
+    () => ({
+      lat: pickup.latitude,
+      lng: pickup.longitude,
+    }),
+    [pickup]
+  );
+
+  if (loadError) return <div>Error loading maps</div>;
+  if (!isLoaded) return <div>Loading Maps...</div>;
 
   return (
-    <div className={`w-full h-72 relative rounded-xl overflow-hidden ${className}`}>
-      {/* Static map placeholder */}
-      <div 
-        ref={mapRef} 
-        className="w-full h-full bg-gray-200 flex items-center justify-center"
-      >
-        {!mapLoaded ? (
-          <div className="animate-pulse">Loading map...</div>
-        ) : (
+    <div className={className} style={{ position: "relative" }}>
+      {/* Legend overlay */}
+      <div style={{
+        background: "white",
+        padding: "8px",
+        position: "absolute",
+        top: 10,
+        left: 10,
+        zIndex: 10,
+        boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+        borderRadius: "4px",
+        fontSize: "12px"
+      }}>
+        <div style={{ marginBottom: "4px", fontWeight: "bold" }}>Legend</div>
+        <div>
+          <span style={{
+            backgroundColor: "rgba(0,0,255,0.7)",
+            display: "inline-block",
+            width: "20px",
+            height: "10px",
+            marginRight: "5px"
+          }}></span>High Driver Density
+        </div>
+        <div>
+          <span style={{
+            backgroundColor: "rgba(255,0,0,0.7)",
+            display: "inline-block",
+            width: "20px",
+            height: "10px",
+            marginRight: "5px"
+          }}></span>Heavy Traffic
+        </div>
+      </div>
+
+      <GoogleMap mapContainerStyle={{ width: "100%", height: "400px" }} center={center} zoom={12}>
+        {/* Randomize pickup and destination markers */}
+        <Marker
+          position={{ lat: pickup.latitude + randomOffset(), lng: pickup.longitude + randomOffset() }}
+          label="P"
+        />
+        <Marker
+          position={{ lat: destination.latitude + randomOffset(), lng: destination.longitude + randomOffset() }}
+          label="D"
+        />
+        {driverLocation && (
+          <Marker
+            position={{ lat: driverLocation.latitude, lng: driverLocation.longitude }}
+            label="Driver"
+          />
+        )}
+        {drivers && drivers.map(driver => (
+          <Marker
+            key={driver.id}
+            position={{ lat: driver.latitude, lng: driver.longitude }}
+            icon={{
+              url: getIconForVehicle(driver.vehicleType),
+              scaledSize: new google.maps.Size(24, 24)
+            }}
+          />
+        ))}
+        {showHeatmap && (
           <>
-            {/* This is a placeholder for the Google Maps integration */}
-            <div className="absolute inset-0 bg-gray-100 overflow-hidden">
-              {/* Simulated map background with grid */}
-              <div className="w-full h-full relative" style={{ 
-                backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px), linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)`,
-                backgroundSize: '20px 20px'
-              }}>
-                {/* Pickup location */}
-                <div className="absolute" style={{ 
-                  left: '30%', 
-                  top: '40%',
-                  transform: 'translate(-50%, -50%)'
-                }}>
-                  <div className="bg-namma-blue text-white p-1 rounded-full">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <div className="text-xs font-medium bg-white px-2 py-1 rounded shadow-sm mt-1">
-                    Pickup
-                  </div>
-                </div>
-
-                {/* Destination location (if provided) */}
-                {destination && (
-                  <div className="absolute" style={{ 
-                    left: '70%', 
-                    top: '30%',
-                    transform: 'translate(-50%, -50%)'
-                  }}>
-                    <div className="bg-red-500 text-white p-1 rounded-full">
-                      <MapPin className="h-5 w-5" />
-                    </div>
-                    <div className="text-xs font-medium bg-white px-2 py-1 rounded shadow-sm mt-1">
-                      Destination
-                    </div>
-                  </div>
-                )}
-
-                {/* Driver location (if provided) */}
-                {driverLocation && (
-                  <div 
-                    className="absolute animate-pulse" 
-                    style={{ 
-                      left: '20%', 
-                      top: '60%',
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  >
-                    <div className="bg-yellow-500 text-white p-1 rounded-full">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
-                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
-                        <path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" stroke="currentColor" strokeWidth="2"/>
-                      </svg>
-                    </div>
-                  </div>
-                )}
-
-                {/* Route line between pickup and destination */}
-                {destination && (
-                  <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
-                    <defs>
-                      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#2563EB" />
-                      </marker>
-                    </defs>
-                    <path 
-                      d="M30%,40% Q50%,20% 70%,30%" 
-                      stroke="#2563EB" 
-                      strokeWidth="3" 
-                      strokeDasharray="5,5"
-                      fill="none"
-                      markerEnd="url(#arrow)"
-                    />
-                  </svg>
-                )}
-
-                {/* Driver to pickup route (if driver location is provided) */}
-                {driverLocation && (
-                  <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
-                    <path 
-                      d="M20%,60% Q25%,50% 30%,40%" 
-                      stroke="#FBBF24" 
-                      strokeWidth="3" 
-                      strokeDasharray="3,3"
-                      fill="none"
-                    />
-                  </svg>
-                )}
-              </div>
-            </div>
-            
-            {/* Map overlay with gradient */}
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+            <HeatmapLayer
+              data={driverDensityData.map(
+                (point) => new google.maps.LatLng(point.lat, point.lng)
+              )}
+              options={{
+                radius: 20,
+                gradient: ["rgba(0,0,255,0)", "rgba(0,0,255,1)"],
+              }}
+            />
+            <HeatmapLayer
+              data={trafficData.map(
+                (point) => new google.maps.LatLng(point.lat, point.lng)
+              )}
+              options={{
+                radius: 20,
+                gradient: ["rgba(255,0,0,0)", "rgba(255,0,0,1)"],
+              }}
+            />
           </>
         )}
-      </div>
-      
-      <div className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md">
-        <div className="text-xs text-gray-500">This is a placeholder map.</div>
-        <div className="text-xs font-medium">Interactive Google Maps will be integrated later.</div>
-      </div>
+      </GoogleMap>
     </div>
   );
 };

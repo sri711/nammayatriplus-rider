@@ -1,4 +1,3 @@
-
 // Dummy GPS coordinates (latitude, longitude) for various entities
 
 // User's current location (Bangalore, MG Road area)
@@ -11,7 +10,7 @@ export const userLocation = {
 // Available destinations
 export const popularDestinations = [
   { 
-    id: "dest1", 
+    id: "dest1",
     name: "Indiranagar", 
     latitude: 12.9784, 
     longitude: 77.6408,
@@ -49,33 +48,10 @@ export const popularDestinations = [
 
 // Available vehicle types
 export const vehicleTypes = [
-  {
-    id: "bike",
-    name: "Bike",
-    image: "/placeholder.svg",
-    basePrice: 20,
-    pricePerKm: 7,
-    pricePerMinute: 1,
-    capacity: 1
-  },
-  {
-    id: "auto",
-    name: "Auto",
-    image: "/placeholder.svg",
-    basePrice: 30,
-    pricePerKm: 13,
-    pricePerMinute: 1.5,
-    capacity: 3
-  },
-  {
-    id: "cab",
-    name: "Cab",
-    image: "/placeholder.svg",
-    basePrice: 50,
-    pricePerKm: 18,
-    pricePerMinute: 2,
-    capacity: 4
-  }
+  { id: "bike", name: "Bike", image: "/bike-icon.png" },
+  { id: "auto", name: "Auto", image: "/auto-icon.png" },
+  { id: "cab", name: "Cab", image: "/cab-icon.png" },
+  { id: "carpool", name: "Carpool", image: "/carpool-icon.png" } // new carpool option
 ];
 
 // Available drivers with their current location
@@ -192,5 +168,19 @@ export const availableDrivers = [
     photo: "/placeholder.svg",
     isAvailable: true,
     onlineTime: "4h 5m"
+  },
+  
+  // Carpool drivers
+  {
+    id: "cp1",
+    name: "Amit Sharma",
+    vehicleType: "carpool",
+    vehicleNumber: "KA-01-CP-0001",
+    rating: 4.6,
+    latitude: 12.9700,
+    longitude: 77.5940,
+    photo: "/placeholder.svg",
+    isAvailable: true,
+    onlineTime: "2h 10m"
   }
 ];
