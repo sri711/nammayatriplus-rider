@@ -2,13 +2,20 @@ import React, { useMemo } from "react";
 import { GoogleMap, useLoadScript, HeatmapLayer, Marker } from "@react-google-maps/api";
 import { driverDensityData, trafficData } from "@/data/newdummydata";
 
+interface Location {
+  latitude: number;
+  longitude: number;
+  address: string;
+}
+
 interface MapProps {
-  pickup: { latitude: number; longitude: number; address?: string };
-  destination: { latitude: number; longitude: number; address?: string };
+  pickup: Location;
+  destination: Location;
   driverLocation?: { latitude: number; longitude: number } | null;
   className?: string;
   showHeatmap?: boolean;
-  drivers?: { id: string; latitude: number; longitude: number; vehicleType: string }[];
+  drivers?: any[];
+  waypoints?: Location[];
 }
 
 const getIconForVehicle = (vehicleType: string) => {
@@ -22,7 +29,15 @@ const getIconForVehicle = (vehicleType: string) => {
 // Function to generate a small random offset (approx ±0.0005 degrees)
 const randomOffset = () => (Math.random() - 0.5) * 0.001;
 
-const Map: React.FC<MapProps> = ({ pickup, destination, driverLocation, className, showHeatmap, drivers }) => {
+const Map: React.FC<MapProps> = ({
+  pickup,
+  destination,
+  driverLocation,
+  className = "",
+  showHeatmap = false,
+  drivers = [],
+  waypoints = []
+}) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyAtxaaw2GuXURkOtr6cq0Kzd_Tw-e8Xogw", // Replace with your actual API key.
     libraries: ["visualization"],
@@ -40,38 +55,14 @@ const Map: React.FC<MapProps> = ({ pickup, destination, driverLocation, classNam
   if (!isLoaded) return <div>Loading Maps...</div>;
 
   return (
-    <div className={className} style={{ position: "relative" }}>
-      {/* Legend overlay */}
-      <div style={{
-        background: "white",
-        padding: "8px",
-        position: "absolute",
-        top: 10,
-        left: 10,
-        zIndex: 10,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-        borderRadius: "4px",
-        fontSize: "12px"
-      }}>
-        <div style={{ marginBottom: "4px", fontWeight: "bold" }}>Legend</div>
-        <div>
-          <span style={{
-            backgroundColor: "rgba(0,0,255,0.7)",
-            display: "inline-block",
-            width: "20px",
-            height: "10px",
-            marginRight: "5px"
-          }}></span>High Driver Density
-        </div>
-        <div>
-          <span style={{
-            backgroundColor: "rgba(255,0,0,0.7)",
-            display: "inline-block",
-            width: "20px",
-            height: "10px",
-            marginRight: "5px"
-          }}></span>Heavy Traffic
-        </div>
+    <div className={`bg-gray-100 rounded-lg p-4 ${className}`}>
+      <div className="text-center text-gray-500">
+        <p>Map View</p>
+        <p className="text-sm">From: {pickup.address}</p>
+        {waypoints.map((point, index) => (
+          <p key={index} className="text-sm">Via: {point.address}</p>
+        ))}
+        <p className="text-sm">To: {destination.address}</p>
       </div>
 
       <GoogleMap mapContainerStyle={{ width: "100%", height: "400px" }} center={center} zoom={12}>

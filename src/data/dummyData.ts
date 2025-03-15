@@ -51,7 +51,8 @@ export const vehicleTypes = [
   { id: "bike", name: "Bike", image: "/bike-icon.png" },
   { id: "auto", name: "Auto", image: "/auto-icon.png" },
   { id: "cab", name: "Cab", image: "/cab-icon.png" },
-  { id: "carpool", name: "Carpool", image: "/carpool-icon.png" } // new carpool option
+  { id: "carpool", name: "Carpool", image: "/carpool-icon.png" },
+  { id: "metroyatri", name: "Metro Yatri", image: "/metro-icon.png" } // new Metro Yatri option
 ];
 
 // Available drivers with their current location

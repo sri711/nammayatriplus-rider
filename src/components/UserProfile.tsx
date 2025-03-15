@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,17 +14,44 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ className }) => {
   const [user] = useState({
-    name: "Rahul Sharma",
-    avatar: "https://randomuser.me/api/portraits/men/44.jpg",
-    email: "rahul.sharma@example.com",
+    name: "Priya Sharma",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    email: "priya.sharma@example.com",
     phone: "+91 98765 43210",
     address: "123 MG Road, Bangalore",
     totalRides: 48,
     rating: 4.9,
-    rewards: 560
+    nammaPoints: 560
   });
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const nammaCoinsOptions = [
+    {
+      name: "BookMyShow",
+      description: "Get up to ₹200 off on movie tickets",
+      points: 400,
+      image: "/bookmyshow-logo.png"
+    },
+    {
+      name: "Myntra",
+      description: "₹500 Myntra gift voucher",
+      points: 800,
+      image: "/myntra-logo.png"
+    },
+    {
+      name: "Amazon",
+      description: "₹250 Amazon gift card",
+      points: 500,
+      image: "/amazon-logo.png"
+    },
+    {
+      name: "Swiggy",
+      description: "₹150 off on your next order",
+      points: 300,
+      image: "/swiggy-logo.png"
+    }
+  ];
 
   return (
     <div className={cn("w-full max-w-3xl mx-auto", className)}>
@@ -85,18 +111,19 @@ const UserProfile: React.FC<UserProfileProps> = ({ className }) => {
                 <div className="flex items-center justify-center mb-1">
                   <Award className="h-5 w-5 text-namma-blue" />
                 </div>
-                <div className="text-lg font-semibold">{user.rewards}</div>
-                <div className="text-xs text-muted-foreground">Reward Points</div>
+                <div className="text-lg font-semibold">{user.nammaPoints}</div>
+                <div className="text-xs text-muted-foreground">Namma Points</div>
               </div>
             </div>
           </div>
         </div>
         
         <Tabs defaultValue="account" className="p-6 pt-0">
-          <TabsList className="w-full grid grid-cols-3 mt-4">
+          <TabsList className="w-full grid grid-cols-4 mt-4">
             <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="payment">Payment</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="nammacoins">NammaCoins</TabsTrigger>
           </TabsList>
           
           <TabsContent value="account" className="mt-6 space-y-4">
@@ -224,6 +251,51 @@ const UserProfile: React.FC<UserProfileProps> = ({ className }) => {
                       Change Password
                     </Button>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="nammacoins" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Use Your NammaCoins</CardTitle>
+                <CardDescription>
+                  Redeem your Namma Points for exciting offers and rewards.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 p-4 bg-muted rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold">Available Points</h3>
+                      <p className="text-2xl font-bold text-namma-blue">{user.nammaPoints}</p>
+                    </div>
+                    <Award className="h-8 w-8 text-namma-blue" />
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  {nammaCoinsOptions.map((option, index) => (
+                    <div key={index} className="flex items-start p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="w-12 h-12 bg-muted rounded-lg mr-4 flex items-center justify-center">
+                        <img src={option.image} alt={option.name} className="w-8 h-8 object-contain" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">{option.name}</h4>
+                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="ml-auto"
+                          >
+                            Avail Voucher
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
