@@ -8,6 +8,8 @@ NammaYatriPlus is a comprehensive ride-sharing platform that is designed on top 
 2. **Rider Interface**
 3. **Supply-Demand Backend**
 
+Final round presentation: https://www.canva.com/design/DAGh3p_QvHA/bE4TRF16wO0Ho1y3Olf5Tw/edit?utm_content=DAGh3p_QvHA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 ## Components
 
 ### Driver Interface
