@@ -133,7 +133,4 @@ npm run dev
 - **Translation**: Sarvam API
 - **Clustering**: scikit-learn
 
-## License
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
