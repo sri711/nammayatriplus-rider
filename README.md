@@ -10,6 +10,8 @@ NammaYatriPlus is a comprehensive ride-sharing platform that is designed on top 
 
 Final round presentation: https://www.canva.com/design/DAGh3p_QvHA/bE4TRF16wO0Ho1y3Olf5Tw/edit?utm_content=DAGh3p_QvHA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
+Demo Video: https://drive.google.com/file/d/1KXctjzkmN-SIAoWk3X0f39KLWPpvhNsl/view?usp=sharing
+
 ## Components
 
 ### Driver Interface
@@ -136,3 +138,23 @@ npm run dev
 - **Clustering**: scikit-learn
 
 
+
+## Contact
+
+### Sriprakash T
+**Department of Metallurgical and Materials Engineering**  
+Indian Institute of Technology, Madras  
+Chennai, Tamil Nadu 600036  
+Email: [mm23b066@smail.iitm.ac.in](mailto:mm23b066@smail.iitm.ac.in)
+
+### Harshith M R
+**Department of Mechanical Engineering**  
+Indian Institute of Technology, Madras  
+Chennai, Tamil Nadu 600036  
+Email: [me23b049@smail.iitm.ac.in](mailto:me23b049@smail.iitm.ac.in)
+
+### Praveen Kumar S
+**Department of Engineering Design**  
+Indian Institute of Technology, Madras  
+Chennai, Tamil Nadu 600036  
+Email: [ed23b038@smail.iitm.ac.in](mailto:ed23b038@smail.iitm.ac.in)
