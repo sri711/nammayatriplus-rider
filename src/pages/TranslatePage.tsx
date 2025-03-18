@@ -103,7 +103,7 @@ const TranslatePage: React.FC = () => {
       const response = await fetch('https://api.sarvam.ai/speech-to-text-translate', {
         method: 'POST',
         headers: {
-          'api-subscription-key': '33849073-620d-4062-87e1-b4d05e7a28a9',
+          'api-subscription-key': '',
         },
         body: form,
       });
