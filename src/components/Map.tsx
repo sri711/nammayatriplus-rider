@@ -39,7 +39,7 @@ const Map: React.FC<MapProps> = ({
   waypoints = []
 }) => {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyAtxaaw2GuXURkOtr6cq0Kzd_Tw-e8Xogw", // Replace with your actual API key.
+    googleMapsApiKey: "", // Replace with your actual API key.
     libraries: ["visualization"],
   });
 
